@@ -1,17 +1,26 @@
 ---
-- hosts: r530-1
+- hosts: idrac
   connection: local
+  name: Change iDRAC NTP Attributes
+  gather_facts: False
+
+  vars:
+    ntpenable: "Enabled"
+    ntpserver1: "time.navy.mi.th"
+    ntpserver2: "time1.nimt.or.th"
+    ntptimezone: "Asia/Bangkok"
 
   tasks:
-    - name: Enable NTP and set NTP server and Time zone attributes in iDRAC
-      community.general.idrac_redfish_config:
-        category: Manager
-        command: SetManagerAttributes
-        resource_id: iDRAC.Embedded.1
-        manager_attributes:
-          NTPConfigGroup.1.NTPEnable: "Enabled"
-          NTPConfigGroup.1.NTP1: "time1.nimt.or.th"
-          Time.1.Timezone: "Asia/Bangkok"
-        baseuri: "{{ baseuri }}"
-        username: "{{ username}}"
-        password: "{{ password }}"
+  - name: Enable NTP and set NTP server and Time zone
+    idrac_redfish_config:
+      category: Manager
+      command: SetManagerAttributes
+      resource_id: iDRAC.Embedded.1
+      manager_attributes:
+        NTPConfigGroup.1.NTPEnable: "{{ ntpenable }}"
+        NTPConfigGroup.1.NTP1: "{{ ntpserver1 }}"
+        NTPConfigGroup.1.NTP2: "{{ ntpserver2 }}"
+        Time.1.Timezone: "{{ntptimezone}}"
+      baseuri: "{{ baseuri }}"
+      username: "{{ username}}"
+      password: "{{ password }}"
