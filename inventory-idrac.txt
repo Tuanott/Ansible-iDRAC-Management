@@ -1,6 +1,0 @@
-[idrac]
-r750-1 baseuri=10.10.40.240
-[idrac:vars]
-username=root
-password=calvin!
-
