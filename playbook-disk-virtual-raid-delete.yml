@@ -1,0 +1,28 @@
+---
+- name: Delete RAID Virtual Disk
+  hosts: idrac 
+  connection: local
+  gather_facts: false
+  vars:
+    idrac_ip: "{{ baseuri }}"
+    idrac_user: "{{ username }}"
+    idrac_password: "{{ password }}"
+    controller_id: "RAID.SL.3-1"
+    virtual_disk_id: "Disk.Virtual.0:RAID.SL.3-1"   # <<< ชื่อ Volume ที่จะลบ
+
+  tasks:
+    - name: Delete RAID Virtual Disk
+      uri:
+        url: "https://{{ idrac_ip }}/redfish/v1/Systems/System.Embedded.1/Storage/{{ controller_id }}/Volumes/{{ virtual_disk_id }}"
+        method: DELETE
+        user: "{{ idrac_user }}"
+        password: "{{ idrac_password }}"
+        force_basic_auth: yes
+        validate_certs: no
+        status_code: [200, 202, 204]
+      register: delete_result
+
+    - name: Show result
+      debug:
+        var: delete_result
+

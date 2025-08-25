@@ -1,0 +1,38 @@
+- name: Boot ISO via iDRAC Redfish Virtual Media
+  hosts: idrac
+  connection: local
+  gather_facts: false
+  vars:
+    iso_url: "http://10.10.20.132/isos/esxi-custom.iso"
+    ansible_python_interpreter: /usr/bin/python3
+
+  tasks:
+    - name: Insert virtual media (ISO)
+      community.general.redfish_command:
+        category: Manager
+        command: VirtualMediaInsert
+        baseuri: "{{ baseuri }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        virtual_media:
+          image_url: "{{ iso_url }}"
+          media_types: ["CD", "DVD"]
+
+    - name: Set boot device to CD/DVD
+      community.general.redfish_command:
+        category: Systems
+        command: SetOneTimeBoot
+        baseuri: "{{ baseuri }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        bootdevice: Cd
+        boot_override_mode: UEFI
+
+    - name: Reboot server
+      community.general.redfish_command:
+        category: Systems
+        command: PowerForceRestart
+        baseuri: "{{ baseuri }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+

@@ -1,0 +1,7 @@
+- name: Ping iDRAC hosts
+  hosts: idrac
+  connection: local
+  gather_facts: no
+  tasks:
+    - name: Ping iDRAC
+      ansible.builtin.ping:

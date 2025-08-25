@@ -1,0 +1,24 @@
+---
+- name: Discover storage configuration before creating RAID 1
+  hosts: idrac
+  connection: local
+  gather_facts: false
+  vars:
+    idrac_ip: "{{ baseuri }}"
+    idrac_user: "{{ username }}"
+    idrac_password: "{{ password }}"
+    ansible_python_interpreter: /usr/bin/python3
+  tasks:
+    - name: Get current storage configuration
+      dellemc.openmanage.idrac_storage_volume:
+        idrac_ip: "{{ idrac_ip }}"
+        idrac_user: "{{ idrac_user }}"
+        idrac_password: "{{ idrac_password }}"
+        validate_certs: false
+        state: view
+      register: storage_info
+      ignore_errors: true
+
+    - name: Display storage information
+      debug:
+        var: storage_info

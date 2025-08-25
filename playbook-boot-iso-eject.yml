@@ -1,0 +1,20 @@
+- name: Boot ISO via iDRAC Redfish Virtual Media
+  hosts: idrac
+  connection: local
+  gather_facts: false
+  vars:
+    iso_url: "http://10.10.20.132/isos/esxi-custom.iso"
+    ansible_python_interpreter: /usr/bin/python3
+
+  tasks:
+    - name: Eject existing virtual media
+      community.general.redfish_command:
+        category: Manager
+        command: VirtualMediaEject
+        baseuri: "{{ baseuri }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        virtual_media:
+          image_url: "{{ iso_url }}"
+          media_types: ["CD", "DVD"]
+      ignore_errors: yes

@@ -1,0 +1,27 @@
+---
+- name: Discover storage configuration before creating RAID 1 (via Redfish)
+  hosts: idrac
+  connection: local
+  gather_facts: false
+  vars:
+    idrac_ip: "{{ baseuri }}"
+    idrac_user: "{{ username }}"
+    idrac_password: "{{ password }}"
+    ansible_python_interpreter: /usr/bin/python3
+
+  tasks:
+    - name: Get storage collection from Redfish
+      community.general.redfish_info:
+        category: Systems
+        command: GetResource
+        baseuri: "{{ idrac_ip }}"
+        username: "{{ idrac_user }}"
+        password: "{{ idrac_password }}"
+        resource: "/redfish/v1/Systems/System.Embedded.1/Storage"
+        validate_certs: false
+      register: storage_info
+
+    - name: Show storage info
+      debug:
+        var: storage_info
+

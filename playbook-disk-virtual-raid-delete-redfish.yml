@@ -1,0 +1,19 @@
+---
+- name: Delete RAID Virtual Disk
+  hosts: idrac 
+  connection: local
+  gather_facts: false
+  vars:
+    controller_id: "RAID.SL.3-1"
+    virtual_disk_id: "Disk.Virtual.0:RAID.SL.3-1"   # <<< ชื่อ Volume ที่จะลบ
+    ansible_python_interpreter: /usr/bin/python3
+
+  tasks:
+    - name: Delete an existing volume
+      dellemc.openmanage.redfish_storage_volume:
+        baseuri: "{{ baseuri }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        validate_certs: no
+        state: "absent"
+        volume_id: "{{ virtual_disk_id }}"

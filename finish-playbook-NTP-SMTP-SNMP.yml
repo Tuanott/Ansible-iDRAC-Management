@@ -1,0 +1,76 @@
+---
+- hosts: idrac
+  connection: local
+  name: Setup default NTP SMTP SNMP
+  gather_facts: False
+
+  vars:
+    idrac_ip: "{{ baseuri }}"
+    idrac_user: "{{ username }}"
+    idrac_password: "{{ password }}"
+
+    ntp_enable: "Enabled"
+    ntp_server1: "time.navy.mi.th"
+    ntp_server2: "time1.nimt.or.th"
+    ntp_timezone: "Asia/Bangkok"
+
+    smtp_ipaddress: "192.168.0.3"
+    smtp_auth: "Enabled"
+    smtp_port: 25
+    smtp_user: "username"
+    smtp_pass: "password"
+
+    snmp_alert_port: 162
+    snmp_format: "SNMPv1"
+    snmp_agent_enable: "Enabled"
+    snmp_agent_community: "public"
+    snmp_protocol: "All"
+    snmp_disc_port: 161
+
+    
+  tasks:
+  - name: Enable NTP and set NTP server and Time zone
+    idrac_redfish_config:
+      category: Manager
+      command: SetManagerAttributes
+      resource_id: iDRAC.Embedded.1
+      manager_attributes:
+        NTPConfigGroup.1.NTPEnable: "{{ ntp_enable }}"
+        NTPConfigGroup.1.NTP1: "{{ ntp_server1 }}"
+        NTPConfigGroup.1.NTP2: "{{ ntp_server2 }}"
+        Time.1.Timezone: "{{ntp_timezone}}"
+      baseuri: "{{ baseuri }}"
+      username: "{{ username}}"
+      password: "{{ password }}"
+  
+  - name: Configure the iDRAC attributes for SMTP alert settings.
+    dellemc.openmanage.idrac_attributes:
+      idrac_ip: "{{ idrac_ip }}"
+      idrac_user: "{{ idrac_user }}"
+      idrac_password: "{{ idrac_password }}"
+      validate_certs: no
+      idrac_attributes:
+        RemoteHosts.1.SMTPServerIPAddress: "{{ smtp_ipaddress }}"
+        RemoteHosts.1.SMTPAuthentication: "{{ smtp_auth }}"
+        RemoteHosts.1.SMTPPort: "{{ smtp_port }}"
+        RemoteHosts.1.SMTPUserName: "{{ smtp_user }}"
+        RemoteHosts.1.SMTPPassword: "{{ smtp_pass }}"
+  
+  - name: Configure SNMP community string, port, protocol and trap format
+    community.general.idrac_redfish_config:
+      baseuri: "{{ baseuri }}"
+      username: "{{ username}}"
+      password: "{{ password }}"
+      category: Manager
+      command: SetManagerAttributes
+      resource_id: iDRAC.Embedded.1
+      manager_attributes:
+        SNMP.1.AgentEnable: "{{ snmp_agent_enable }}"
+        SNMP.1.AgentCommunity: "{{ snmp_agent_community }}"
+        SNMP.1.TrapFormat: "{{ snmp_format }}"
+        SNMP.1.SNMPProtocol: "{{ snmp_protocol }}"
+        SNMP.1.DiscoveryPort: "{{ snmp_disc_port }}"
+        SNMP.1.AlertPort: "{{ snmp_alert_port }}"
+
+
+

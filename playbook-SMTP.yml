@@ -1,0 +1,24 @@
+---
+- name: config SMTP
+  hosts: idrac
+  connection: local
+  vars:
+    idrac_ip: "{{ baseuri }}"
+    idrac_user: "{{ username }}"
+    idrac_password: "{{ password }}"
+
+  tasks:
+    - name: Configure the iDRAC attributes for SMTP alert settings.
+      dellemc.openmanage.idrac_attributes:
+        idrac_ip: "{{ idrac_ip }}"
+        idrac_user: "{{ idrac_user }}"
+        idrac_password: "{{ idrac_password }}"
+        validate_certs: no
+        idrac_attributes:
+          RemoteHosts.1.SMTPServerIPAddress: 192.168.0.3
+          RemoteHosts.1.SMTPAuthentication: Enabled
+          RemoteHosts.1.SMTPPort: 25
+          RemoteHosts.1.SMTPUserName: Username
+          RemoteHosts.1.SMTPPassword: P@ssw0rd!
+          
+

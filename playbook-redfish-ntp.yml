@@ -1,0 +1,17 @@
+---
+- hosts: r530-1
+  connection: local
+
+  tasks:
+    - name: Enable NTP and set NTP server and Time zone attributes in iDRAC
+      community.general.idrac_redfish_config:
+        category: Manager
+        command: SetManagerAttributes
+        resource_id: iDRAC.Embedded.1
+        manager_attributes:
+          NTPConfigGroup.1.NTPEnable: "Enabled"
+          NTPConfigGroup.1.NTP1: "time1.nimt.or.th"
+          Time.1.Timezone: "Asia/Bangkok"
+        baseuri: "{{ baseuri }}"
+        username: "{{ username}}"
+        password: "{{ password }}"

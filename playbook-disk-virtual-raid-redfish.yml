@@ -1,0 +1,43 @@
+- name: Create RAID1 on 2 disks via Redfish
+  hosts: idrac
+  connection: local
+  gather_facts: no
+  vars:
+    idrac_ip: "{{ baseuri }}"
+    idrac_user: "{{ username }}"
+    idrac_pass: "{{ password }}"
+    raid_controller: "RAID.SL.3-1"   # ตรวจสอบจาก iDRAC
+    raid_disks:
+      - "Disk.Bay.0:Enclosure.Internal.0-1:RAID.SL.3-1"
+      - "Disk.Bay.1:Enclosure.Internal.0-1:RAID.SL.3-1"
+    virtual_disk_name: "RAID1Naja"
+    ansible_python_interpreter: /usr/bin/python3
+  tasks:
+
+    - name: Convert disks to RAID capable
+      dellemc.openmanage.idrac_redfish_storage_controller:
+        baseuri: "{{ idrac_ip }}"
+        username: "{{ idrac_user }}"
+        password: "{{ idrac_pass }}"
+        validate_certs: no
+        command: "ConvertToRAID"
+        target: "{{ item }}"
+      loop: "{{ raid_disks }}"
+      register: convert_results
+
+    - name: Wait a few seconds for iDRAC to update disk state
+      pause:
+        seconds: 10
+    - name: Create RAID1 Virtual Disk via Redfish
+      dellemc.openmanage.redfish_storage_volume:
+        baseuri: "{{ idrac_ip }}"
+        username: "{{ idrac_user }}"
+        password: "{{ idrac_pass }}"
+        validate_certs: no
+        controller_id: "{{ raid_controller }}"
+        name: "{{ virtual_disk_name }}"
+        raid_type: "RAID1"
+        drives: "{{ raid_disks }}"
+        initialize_type: "Fast"
+        state: present
+

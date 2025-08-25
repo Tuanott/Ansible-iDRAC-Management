@@ -1,0 +1,81 @@
+---
+- name: Dell iDRAC Power Control via Redfish
+  hosts: idrac
+  connection: local
+  gather_facts: false
+  pre_tasks:
+    - name: Ensure playbook is run with tag
+      fail:
+        msg: "You must run this playbook with a tag! Example: ansible-playbook site.yml --tags [graceful_restart][force_off][force_restart][graceful_shutdown][power_on][reboot]"
+      when: ansible_run_tags | length == 1
+  vars:
+    resource_id: "System.Embedded.1"   # ส่วนมาก Dell ใช้อันนี้แทน serial number
+    ansible_python_interpreter: /usr/bin/python3
+
+  tasks:
+    - name: Restart system power gracefully
+      community.general.redfish_command:
+        category: Systems
+        command: PowerGracefulRestart
+        resource_id: "{{ resource_id }}"
+        baseuri: "{{ baseuri }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+      tags: 
+        - graceful_restart
+
+    - name: Turn system power off (force)
+      community.general.redfish_command:
+        category: Systems
+        command: PowerForceOff
+        resource_id: "{{ resource_id }}"
+        baseuri: "{{ baseuri }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+      tags: 
+        - force_off
+
+    - name: Restart system power forcefully
+      community.general.redfish_command:
+        category: Systems
+        command: PowerForceRestart
+        resource_id: "{{ resource_id }}"
+        baseuri: "{{ baseuri }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+      tags: 
+        - force_restart
+
+    - name: Shutdown system power gracefully
+      community.general.redfish_command:
+        category: Systems
+        command: PowerGracefulShutdown
+        resource_id: "{{ resource_id }}"
+        baseuri: "{{ baseuri }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+      tags: 
+        - graceful_shutdown
+
+    - name: Turn system power on
+      community.general.redfish_command:
+        category: Systems
+        command: PowerOn
+        resource_id: "{{ resource_id }}"
+        baseuri: "{{ baseuri }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+      tags: 
+        - power_on
+
+    - name: Reboot system power
+      community.general.redfish_command:
+        category: Systems
+        command: PowerReboot
+        resource_id: "{{ resource_id }}"
+        baseuri: "{{ baseuri }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+      tags: 
+        - reboot
+
