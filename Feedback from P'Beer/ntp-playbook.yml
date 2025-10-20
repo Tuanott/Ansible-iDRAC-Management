@@ -1,0 +1,25 @@
+---
+- hosts: idrac
+  connection: local
+  name: Setup default NTP SMTP SNMP
+  gather_facts: False
+
+  vars:
+    idrac_ip: "{{ baseuri }}"
+    idrac_user: "{{ username }}"
+    idrac_password: "{{ password }}"
+
+  tasks:
+  - name: Enable NTP and set NTP server and Time zone
+    idrac_redfish_config:
+      category: Manager
+      command: SetManagerAttributes
+      resource_id: iDRAC.Embedded.1
+      manager_attributes:
+        NTPConfigGroup.1.NTPEnable: "{{ ntp_enable }}"
+        NTPConfigGroup.1.NTP1: "{{ ntp_server1 }}"
+        NTPConfigGroup.1.NTP2: "{{ ntp_server2 }}"
+        Time.1.Timezone: "{{ntp_timezone}}"
+      baseuri: "{{ baseuri }}"
+      username: "{{ username}}"
+      password: "{{ password }}"
