@@ -1,0 +1,27 @@
+---
+- hosts: idrac
+  connection: local
+  name: Setup default NTP SMTP SNMP
+  gather_facts: False
+
+  vars:
+    idrac_ip: "{{ baseuri }}"
+    idrac_user: "{{ username }}"
+    idrac_password: "{{ password }}"
+  
+  tasks:
+    - name: Configure SNMP community string, port, protocol and trap format
+    community.general.idrac_redfish_config:
+      baseuri: "{{ baseuri }}"
+      username: "{{ username}}"
+      password: "{{ password }}"
+      category: Manager
+      command: SetManagerAttributes
+      resource_id: iDRAC.Embedded.1
+      manager_attributes:
+        SNMP.1.AgentEnable: "{{ snmp_agent_enable }}"
+        SNMP.1.AgentCommunity: "{{ snmp_agent_community }}"
+        SNMP.1.TrapFormat: "{{ snmp_format }}"
+        SNMP.1.SNMPProtocol: "{{ snmp_protocol }}"
+        SNMP.1.DiscoveryPort: "{{ snmp_disc_port }}"
+        SNMP.1.AlertPort: "{{ snmp_alert_port }}"
