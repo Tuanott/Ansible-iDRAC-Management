@@ -1,4 +1,4 @@
-- name: Test fake firmware update (safe)
+- name: firmware update
   hosts: idrac
   connection: local
   gather_facts: false
